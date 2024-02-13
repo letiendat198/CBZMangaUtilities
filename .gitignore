@@ -1,4 +1,4 @@
-src
+src/*
 !src/*.py
 .idea
 venv
