@@ -46,13 +46,13 @@ class Analyzer(QWidget):
             self.progress_bar.setMaximum(content)
             self.progress_bar.setMinimum(1)
             self.label.setText("Analyzing obtained files...")
-            self.task.grayscale_check_task()
+            self.task.analyze_task()
 
         if update_code == 2:  # Update code 2: Grayscale scan progress
             # if content > self.progress:
             #     self.progress = content
             self.progress += content
-            print("Progress bar value:", self.progress)
+            # print("Progress bar value:", self.progress)
             self.progress_bar.setValue(self.progress)
 
     def on_error(self, err):

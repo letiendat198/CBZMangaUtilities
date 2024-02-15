@@ -4,6 +4,9 @@ from PyQt5.QtCore import *
 
 from ThreadWorker import Worker, WorkerSignal
 from MangaUtilities import *
+from DataManager import *
+
+data = DataManager()
 
 
 class AnalyzeTask:
@@ -16,16 +19,16 @@ class AnalyzeTask:
     def unpack_task(self):
         self.worker = Worker(self.utilities.unpack, self.path, os.getcwd())
         self.worker.signal.error.connect(self.signal.error.emit)
-        self.worker.signal.result.connect(self.on_unpack_result)  # Receive result signal from self.worker
+        self.worker.signal.result.connect(self.on_unpack_result)
 
         self.threadpool.start(self.worker)
 
-    def grayscale_check_task(self):
-        # TODO: Make a new thread to distribute load instead of scanning all files in one thread
+    def analyze_task(self):
         self.iter_task = IterateTask()
-        self.worker = Worker(self.iter_task.iterating_to_worker_task, self.utilities.target_files, self.utilities.check_grayscale, "Quarter")
+        self.worker = Worker(self.iter_task.iterating_to_worker_task, self.utilities.grayscale_and_hash, self.utilities.target_files, "Quarter")
         self.iter_task.signal.error.connect(self.signal.error.emit)
-        self.iter_task.signal.result.connect(self.on_grayscale_result)  # Receive result signal from self.worker
+        self.iter_task.signal.result.connect(self.on_analyze_result)
+        self.worker.signal.finished.connect(self.on_analyze_finished)
 
         self.threadpool.start(self.worker)
 
@@ -33,13 +36,37 @@ class AnalyzeTask:
         work_files = res[1]
         self.signal.progress.emit((1, len(work_files)))
 
-    def on_grayscale_result(self, res):
-        # file = res[0]
-        # status = res[1]
-        # image_count = re.findall(r'\d+', os.path.basename(file))
-        # print("Emitting", int(image_count[0]))
-        # No need for hacky progress tracking with file name
+    def on_analyze_result(self, res):
+        print(res)
         self.signal.progress.emit((2, 1))
+
+    def on_analyze_finished(self):
+        data.overwrite_dict(dict(sorted(self.utilities.file_dict.items())), 0)  # 0 for data.json
+        data.overwrite_dict(self.utilities.hash_dict, 1)  # 1 for hash.json
+
+        # TODO: Temporary group dict generation, VERY BLOCKING! Need to move
+        group_dict = {
+            "UC": [],
+            "RC": [],
+            "UBW": [],
+            "RBW": []
+        }
+        group_dict_set = {
+            "UC": set(),
+            "RC": set(),
+            "UBW": set(),
+            "RBW": set()
+        }
+        for file in self.utilities.file_dict:
+            xhash = self.utilities.file_dict[file]["hash"]
+            group = self.utilities.file_dict[file]["group"]
+            if xhash not in group_dict_set[group]:
+                group_dict_set[group].add(xhash)
+                group_dict[group].append(xhash)
+
+        data.overwrite_dict(group_dict, 2)  # 2 for group.json
+
+        self.signal.finished.emit()
 
 
 class IterateTask:
@@ -47,7 +74,7 @@ class IterateTask:
         self.signal = WorkerSignal()
         self.threadpool = QThreadPool()  # Need a separate threadpool to correctly wait for sub-thread
 
-    def iterating_to_worker_task(self, iterable, fn, *args, **kwargs):
+    def iterating_to_worker_task(self, fn, iterable, *args, **kwargs):
         count = 0
         for item in iterable:  # for loop will block event processing (emitting)
             QCoreApplication.instance().processEvents()  # Need this to allow event processing
@@ -55,7 +82,7 @@ class IterateTask:
             self.worker = Worker(fn, item, *args, **kwargs)
             self.worker.signal.error.connect(self.signal.error.emit)
             self.worker.signal.result.connect(self.signal.result.emit)
-            self.worker.signal.finished.connect(self.signal.finished.emit)
+            # self.worker.signal.finished.connect(self.signal.finished.emit)
             self.worker.signal.progress.connect(self.signal.progress.emit)
 
             self.threadpool.start(self.worker)
