@@ -41,7 +41,8 @@ class AnalyzeTask:
         self.signal.progress.emit((2, 1))
 
     def on_analyze_finished(self):
-        data.overwrite_dict(dict(sorted(self.utilities.file_dict.items())), 0)  # 0 for data.json
+        self.utilities.file_dict = dict(sorted(self.utilities.file_dict.items()))
+        data.overwrite_dict(self.utilities.file_dict, 0)  # 0 for data.json
         data.overwrite_dict(self.utilities.hash_dict, 1)  # 1 for hash.json
 
         # TODO: Temporary group dict generation, VERY BLOCKING! Need to move
@@ -95,3 +96,7 @@ class IterateTask:
         self.threadpool.waitForDone()  # Catch the last batch of jobs and disallow the function to return
         QCoreApplication.instance().processEvents()  # Process final batch of events
 
+
+class ExportTask:
+    def __init__(self):
+        pass

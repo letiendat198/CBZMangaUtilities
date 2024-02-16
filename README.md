@@ -26,15 +26,14 @@ Also to rework my GUI skill a bit (This time GUI actually have a nice separation
 - ~~Add a list view of all images in group~~ (Though for repeating images, only the first one is shown)
 - ~~Add a way to return to main view~~
 - ~~Add image preview~~
-
+- ~~Make import update the UI~~
+- ~~Add selection highlight~~
+- ~~Add inclusion/exclusion option for each individual image~~
 </details>
 
-- Rework return button to something more acceptable
-- Make import update the UI
-- Add selection highlight
-- Add inclusion/exclusion option for each individual image
 - Add export
 - Add settings
+- Rework return button to something more acceptable
 - Add localization
 - Will add when remember
 
@@ -42,14 +41,16 @@ Also to rework my GUI skill a bit (This time GUI actually have a nice separation
 <details>
   <summary>Fixed</summary>
 
+- ~~Pages become unordered in group dictionary, resulting in unordered list view~~
+
 </details>
 
-- Pages become unordered in group dictionary, resulting in unordered list view
+- Front image highlight when clicked will obscure images in the back
 
 ## License
 Probably will be GPLv3
 
 ## Attribute
-<a href="https://www.flaticon.com/free-icons/confirm" title="confirm icons">Confirm icons created by hqrloveq - Flaticon</a>
-<a href="https://www.flaticon.com/free-icons/close" title="close icons">Close icons created by hqrloveq - Flaticon</a>
+<a href="https://www.flaticon.com/free-icons/confirm" title="confirm icons">Confirm icons created by hqrloveq - Flaticon</a> \
+<a href="https://www.flaticon.com/free-icons/close" title="close icons">Close icons created by hqrloveq - Flaticon</a> \
 <a href="https://www.flaticon.com/free-icons/minus" title="minus icons">Minus icons created by Pixel perfect - Flaticon</a>

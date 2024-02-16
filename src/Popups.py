@@ -12,8 +12,10 @@ from TaskHelper import *
 
 
 class Analyzer(QWidget):
-    def __init__(self, path, threadpool):
+    def __init__(self, path, threadpool, callback):
         super(Analyzer, self).__init__()
+
+        self.callback = callback
 
         self.setWindowTitle("Analyzing...")
         self.setWindowModality(Qt.ApplicationModal)
@@ -60,7 +62,74 @@ class Analyzer(QWidget):
         self.error_popup.show()
 
     def on_finished(self):
+        self.callback()
         self.close()
+
+
+class ExportPopup(QWidget):
+    def __init__(self, threadpool, combobox):
+        super(ExportPopup, self).__init__()
+
+        self.threadpool = threadpool
+        self.combo_box_dict = combobox
+
+        self.setWindowTitle("Export")
+        self.setWindowModality(Qt.ApplicationModal)
+
+        self.view = QFormLayout()
+
+        self.but_row = QHBoxLayout()
+        self.path_edit = QLineEdit()
+        self.choose_path_but = QPushButton("...")
+        self.but_row.addWidget(self.path_edit)
+        self.but_row.addWidget(self.choose_path_but)
+
+        self.status_form = QFormLayout()
+        self.status_label = QLabel("Export status of groups:")
+        self.status_form.addRow(self.status_label)
+        self.status_dict = {}
+        for group in self.combo_box_dict:
+            status = self.combo_box_dict[group].currentText()
+            self.status_dict[group] = status
+            status_icon_dict = {
+                "Include": "resources/check.png",
+                "Exclude": "resources/delete.png",
+                "Include first occurrence": "resources/minus.png"
+            }
+            group_row = QHBoxLayout()
+            icon = QLabel()
+            icon.setPixmap(QPixmap(status_icon_dict[status]).scaled(16, 16))
+            status_label = QLabel(status)
+            group_row.addWidget(icon)
+            group_row.addWidget(status_label)
+            group_row.addStretch()
+            self.status_form.addRow(str(group) + ":", group_row)
+
+        self.confirm_but_row = QHBoxLayout()
+        self.confirm_but = QPushButton("Confirm")
+        self.confirm_but_row.addStretch()
+        self.confirm_but_row.addWidget(self.confirm_but)
+
+        self.view.addRow("Save as", self.but_row)
+        self.view.addRow(self.status_form)
+        self.view.addRow(self.confirm_but_row)
+
+        self.setLayout(self.view)
+
+        self.choose_path_but.clicked.connect(self.on_path_click)
+        self.confirm_but.clicked.connect(self.on_confirm)
+
+    def on_path_click(self):
+        self.path = QFileDialog.getSaveFileName(self, "Save as...", filter="CBZ file (*.cbz) ;; ZIP file (*.zip)")[0]
+        if self.path:
+            self.path_edit.setText(self.path)
+            self.path_edit.setCursorPosition(0)
+
+    def on_confirm(self):
+        for group in self.status_dict:
+            ExportData().update_status(group, self.status_dict[group])
+        self.task = ExportTask()
+
 
 
 class GenericFileChooser(QWidget):
