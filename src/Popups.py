@@ -105,6 +105,16 @@ class ExportPopup(QWidget):
             group_row.addStretch()
             self.status_form.addRow(str(group) + ":", group_row)
 
+        self.compress_row = QHBoxLayout()
+        self.compress_check_box = QCheckBox("Compress JPEGs")
+        self.compress_level = QLineEdit("70")
+        self.compress_row.addWidget(self.compress_check_box)
+        self.compress_row.addWidget(self.compress_level)
+        self.compress_row.addStretch()
+
+        self.delete_work = QCheckBox("Delete work folder after export")
+        self.delete_work.setDisabled(True)
+
         self.confirm_but_row = QHBoxLayout()
         self.confirm_but = QPushButton("Confirm")
         self.confirm_but_row.addStretch()
@@ -112,6 +122,8 @@ class ExportPopup(QWidget):
 
         self.view.addRow("Save as", self.but_row)
         self.view.addRow(self.status_form)
+        self.view.addRow(self.compress_row)
+        self.view.addRow(self.delete_work)
         self.view.addRow(self.confirm_but_row)
 
         self.setLayout(self.view)
@@ -128,8 +140,83 @@ class ExportPopup(QWidget):
     def on_confirm(self):
         for group in self.status_dict:
             ExportData().update_status(group, self.status_dict[group])
-        self.task = ExportTask()
+        self.progress = ExportProgressPopup(self.threadpool, self.path_edit.text(), self.compress_check_box.isChecked(),
+                                            self.compress_level.text() if self.compress_check_box.isChecked() else None)
+        self.progress.show()
+        self.close()
 
+
+class ExportProgressPopup(QWidget):
+    def __init__(self, threadpool, out_path, is_compress, quality=None):
+        super(ExportProgressPopup, self).__init__()
+
+        self.out_path = out_path
+        self.is_compress = is_compress
+        if quality is not None:
+            self.quality = int(quality)
+
+        self.setWindowTitle("Exporting...")
+        self.setWindowModality(Qt.ApplicationModal)
+
+        self.view = QVBoxLayout()
+        self.view.setAlignment(Qt.AlignCenter)
+
+        # GUI starts here
+        self.label = QLabel("Calculating work load...")
+        self.progress_bar = QProgressBar()
+        self.progress_bar.setMaximum(0)
+        self.progress_bar.setMinimum(0)
+        self.progress = 0
+
+        self.view.addWidget(self.label)
+        self.view.addWidget(self.progress_bar)
+
+        self.setLayout(self.view)
+
+        self.task = ExportTask(threadpool)
+        self.task.signal.progress.connect(self.on_update)
+        self.task.signal.error.connect(self.on_error)
+        self.task.signal.finished.connect(self.on_finished)
+        self.task.load_task()
+
+    def on_update(self, prog):
+        update_code = prog[0]
+        content = prog[1]
+        if update_code == 0:  # Update code 0: Done loading target, start compress or skip over to export
+            print("Loading target done, target len:", content)
+            self.progress_bar.setMaximum(content)
+            self.progress_bar.setMinimum(1)
+            if self.is_compress:
+                self.label.setText("Compressing JPEGs files...")
+                self.task.compress_task(self.quality)
+            else:
+                self.label.setText("Exporting...")
+                self.task.export_task(self.out_path)
+
+        if update_code == 1:  # Update code 1: Compress task ongoing
+            if content == 1:  # Content = 1 -> Progress
+                self.progress += content
+                self.progress_bar.setValue(self.progress)
+            else:  # Content = len(target_file) -> Compress done, move to export
+                self.progress_bar.setMaximum(content)
+                self.progress_bar.setMinimum(1)
+                self.progress_bar.setValue(0)
+                self.progress = 0
+                self.label.setText("Exporting...")
+                self.task.export_task(self.out_path)
+
+        if update_code == 2:  # Update code 2: Export task ongoing
+            self.progress += content
+            self.progress_bar.setValue(self.progress)
+
+    def on_error(self, err):
+        self.error_popup = GenericConfirmPopup("Error", str(err), self.close)
+        self.error_popup.show()
+
+    def on_finished(self):
+        self.notice = GenericConfirmPopup("Export completed", "Exported to " + self.out_path, print)
+        self.notice.show()
+        self.close()
 
 
 class GenericFileChooser(QWidget):

@@ -102,24 +102,14 @@ class MangaUtilities:
         return file, xhash, is_grayscale, is_unique
 
     def compress_jpeg(self, file, quality, progress_callback=None):
-        image = Image.open(file)
+        print("Compressing", file, "at quality", quality)
+        image = Image.open(os.path.normpath(file))
         image.save(file, "JPEG", optimize=True, quality=quality)
 
-    def repack(self, path, out, option, progress_callback=None):
-        for dirname in os.listdir(path):  # List all directories in path
-            member_path = []
-            for roots, dirs, files in os.walk(os.path.join(path, dirname)):  # Index all file in sub directories
-                for file in files:
-                    member_path.append(roots + "\\" + file)
+    def repack(self, file_iterable, out, progress_callback=None):
             with zipfile.ZipFile(out, "w") as zip_obj:
-                for file in member_path:
-                    if option == 1:
-                        zip_obj.write(file, arcname=os.path.relpath(file, os.path.join(path, dirname)))
-                    else:
-                        if file.endswith(".jpeg"):
-                            if file.endswith("cover.jpeg"):
-                                zip_obj.write(file, arcname="00000.jpeg")
-                                continue
-                            zip_obj.write(file, arcname=os.path.basename(file))
-            print("Repacking", path, "as", out)
-            shutil.rmtree(path + "\\" + dirname)
+                for file in file_iterable:
+                    zip_obj.write(file, arcname=os.path.basename(file))
+                    progress_callback.emit(0)
+            print("Repacking as", out)
+            # shutil.rmtree(path + "\\" + dirname)

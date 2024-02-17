@@ -3,3 +3,5 @@ src/*
 !src/resources
 .idea
 venv
+build
+dist

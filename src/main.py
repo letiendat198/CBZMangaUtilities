@@ -8,12 +8,13 @@ from typing import Optional
 from Popups import *
 from DataManager import *
 
+
 class MainWindow(QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
 
         self.setWindowTitle("CBZ Manga Utilities")
-        self.resize(1550, 800)
+        self.resize(1400, 800)
 
         preview = Preview()
         workspace = Workspace(preview)
@@ -24,8 +25,8 @@ class MainWindow(QMainWindow):
         main_layout = QVBoxLayout()
         sub_layout = QHBoxLayout()
 
-        sub_layout.addWidget(workspace, 60)
-        sub_layout.addLayout(preview, 40)
+        sub_layout.addWidget(workspace, 70)
+        sub_layout.addLayout(preview, 30)
 
         main_layout.addLayout(sub_layout)
 
@@ -45,7 +46,7 @@ class Workspace(QScrollArea):
         self.setAlignment(Qt.AlignTop)
 
         self.group_view = QGridLayout()
-        self.default_label = QLabel("Nothing yet")
+        self.default_label = QLabel("Nothing yet! Import a file to get started")
 
         self.group_view.addWidget(self.default_label, 0, 0)
         self.group_view.setRowStretch(self.group_view.count(), 1)
@@ -169,7 +170,6 @@ class Workspace(QScrollArea):
                 self.list_view.addLayout(cell_layout, current_row, current_column)
                 current_column += 1
                 if current_column == 4:
-
                     current_row += 1
                     current_column = 0
         self.list_view.addWidget(image_group)
@@ -199,7 +199,7 @@ class Preview(QVBoxLayout):
 
     def set_image(self, path):
         self.image.set_image_from_file(path)
-        self.image.set_scale(600, 800, Qt.KeepAspectRatio)
+        self.image.set_scale(480, 600, Qt.KeepAspectRatio)
 
 
 class MenuBar(QMenuBar):
@@ -317,7 +317,7 @@ class ImageLabel(QLabel):
         if self.status == "Include":
             self.setStyleSheet("background-color: limegreen")
         elif self.status == "Exclude":
-            self.setStyleSheet("background-color: lightcoral")
+            self.setStyleSheet("background-color: crimson")
         elif self.status == "Include first occurrence":
             self.setStyleSheet("background-color: yellow")
         else:

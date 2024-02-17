@@ -3,14 +3,14 @@
 A tool to save myself hours of removing ads from mangas crawled from the seven seas
 and preparing them for KCC (Kindle Comic Converter) to use on my Kindle
 
-Also to rework my GUI skill a bit (This time GUI actually have a nice separation of GUI from backend)
+Also to rework my GUI skill a bit (~~This time GUI actually have a nice separation of GUI from backend~~. 
+Reject humanity, return to spaghetti)
 
-
-## Features (Or what will be the features)
+## Features
 
 - Sort pages into groups (colored repeating, colored unique, b&w repeating, b&w unique)
 - Add or remove such groups into/from the final product (Rapid removal of ads from pirate sites)
-- Compress JPEG images to save space
+- Compress JPEG images to save space (In export menu)
 - Export to KCC-compatible format
 - Will add more when need arise :D
 
@@ -29,10 +29,13 @@ Also to rework my GUI skill a bit (This time GUI actually have a nice separation
 - ~~Make import update the UI~~
 - ~~Add selection highlight~~
 - ~~Add inclusion/exclusion option for each individual image~~
+- ~~Add export~~
+- ~~Add compress~~
 </details>
 
-- Add export
+- Allow work file delete after export
 - Add settings
+- Add updater
 - Rework return button to something more acceptable
 - Add localization
 - Will add when remember
@@ -46,9 +49,15 @@ Also to rework my GUI skill a bit (This time GUI actually have a nice separation
 </details>
 
 - Front image highlight when clicked will obscure images in the back
+- If group status changed but group list view has already been initiated then images highlight won't
+update accordingly
 
 ## License
-Probably will be GPLv3
+```
+CBZ Manga Utilities is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>. 
+```
 
 ## Attribute
 <a href="https://www.flaticon.com/free-icons/confirm" title="confirm icons">Confirm icons created by hqrloveq - Flaticon</a> \

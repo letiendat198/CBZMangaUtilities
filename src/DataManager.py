@@ -39,16 +39,27 @@ class ExportData:
         js = json.dumps(d)
         self.file.overwrite(js)
 
-    def _get_dict(self):
+    def reset(self):
+        template = {
+            "UC": "",
+            "RC": "",
+            "UBW": "",
+            "RBW": "",
+            "Include": [],  # Hash
+            "Exclude": []  # Hash also
+        }
+        self._overwrite_dict(template)
+
+    def get_dict(self):
         return json.loads(self.file.read())
 
     def update_status(self, group, status):
-        modified_dict = self._get_dict()
+        modified_dict = self.get_dict()
         modified_dict[group] = status
         self._overwrite_dict(modified_dict)
 
     def add_exclusion(self, file_hash):
-        modified_dict = self._get_dict()
+        modified_dict = self.get_dict()
         include_set = set(modified_dict["Include"])
         exclude_set = set(modified_dict["Exclude"])
         if file_hash in include_set:
@@ -59,7 +70,7 @@ class ExportData:
         self._overwrite_dict(modified_dict)
 
     def add_inclusion(self, file_hash):
-        modified_dict = self._get_dict()
+        modified_dict = self.get_dict()
         include_set = set(modified_dict["Include"])
         exclude_set = set(modified_dict["Exclude"])
         if file_hash in exclude_set:
@@ -70,14 +81,14 @@ class ExportData:
         self._overwrite_dict(modified_dict)
 
     def check_include(self, file_hash):
-        exp_dict = self._get_dict()
+        exp_dict = self.get_dict()
         include_set = set(exp_dict["Include"])
         if file_hash in include_set:
             return True
         return False
 
     def check_exclude(self, file_hash):
-        exp_dict = self._get_dict()
+        exp_dict = self.get_dict()
         exclude_set = set(exp_dict["Exclude"])
         if file_hash in exclude_set:
             return True
