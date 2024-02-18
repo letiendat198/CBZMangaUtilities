@@ -58,7 +58,7 @@ class Analyzer(QWidget):
             self.progress_bar.setValue(self.progress)
 
     def on_error(self, err):
-        self.error_popup = GenericConfirmPopup("Error", str(err), self.close)
+        self.error_popup = GenericConfirmPopup("Error", str(err), print)
         self.error_popup.show()
 
     def on_finished(self):
@@ -150,6 +150,8 @@ class ExportProgressPopup(QWidget):
     def __init__(self, threadpool, out_path, is_compress, quality=None):
         super(ExportProgressPopup, self).__init__()
 
+        self.setMinimumWidth(300)
+
         self.out_path = out_path
         self.is_compress = is_compress
         if quality is not None:
@@ -210,7 +212,7 @@ class ExportProgressPopup(QWidget):
             self.progress_bar.setValue(self.progress)
 
     def on_error(self, err):
-        self.error_popup = GenericConfirmPopup("Error", str(err), self.close)
+        self.error_popup = GenericConfirmPopup("Error", str(err), print)
         self.error_popup.show()
 
     def on_finished(self):

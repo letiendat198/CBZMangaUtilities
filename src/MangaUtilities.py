@@ -1,5 +1,6 @@
 import os
 import shutil
+import time
 import zipfile
 import xxhash
 
@@ -84,9 +85,18 @@ class MangaUtilities:
         else:  # Hash not unique (Repeating)
             if len(self.hash_dict[xhash]) == 1:  # If there is 1 item, set that item to not unique and update group
                 need_modify = self.hash_dict[xhash][0]
-                need_modify_obj = self.file_dict[need_modify]
-                need_modify_obj["is_unique"] = False
-                need_modify_obj["group"] = self.get_group(need_modify_obj["is_grayscale"], need_modify_obj["is_unique"])
+                for i in range(0, 5):  # Retry 5 time
+                    print("Try", i+1)
+                    try:
+                        need_modify_obj = self.file_dict[need_modify]
+                        need_modify_obj["is_unique"] = False
+                        need_modify_obj["group"] = self.get_group(need_modify_obj["is_grayscale"], need_modify_obj["is_unique"])
+                    except Exception as e:
+                        print(e)
+                        time.sleep(1)  # Wait a second for other thread to write to dict first
+                        continue
+                    break
+
             self.hash_dict[xhash].append(file_name)  # Add item to hash key
             is_unique = False
             prev_file_name = self.hash_dict[xhash][0]

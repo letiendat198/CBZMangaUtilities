@@ -1,7 +1,7 @@
 # CBZ Manga Utilities (CMU)
 
 A tool to save myself hours of removing ads from mangas crawled from the seven seas
-and preparing them for KCC (Kindle Comic Converter) to use on my Kindle
+and preparing them for KCC (Kindle Comic Converter) to use on Kindle
 
 Also to rework my GUI skill a bit (~~This time GUI actually have a nice separation of GUI from backend~~. 
 Reject humanity, return to spaghetti)
@@ -10,6 +10,7 @@ Reject humanity, return to spaghetti)
 
 - Sort pages into groups (colored repeating, colored unique, b&w repeating, b&w unique)
 - Add or remove such groups into/from the final product (Rapid removal of ads from pirate sites)
+- Include/Exclude specific images
 - Compress JPEG images to save space (In export menu)
 - Export to KCC-compatible format
 - Will add more when need arise :D
@@ -45,12 +46,16 @@ Reject humanity, return to spaghetti)
   <summary>Fixed</summary>
 
 - ~~Pages become unordered in group dictionary, resulting in unordered list view~~
-
+- ~~If 2 files are the same and in the same batch of workers, file_dict of 1 file may not
+be ready to edit in case of needing to edit its group. Although mostly non-lethal but 
+racing is not pleasant. Need to look into this~~ (Use try/except to catch this and wait
+1 second for other threads to finish first then try again)
 </details>
 
 - Front image highlight when clicked will obscure images in the back
 - If group status changed but group list view has already been initiated then images highlight won't
 update accordingly
+
 
 ## License
 ```
