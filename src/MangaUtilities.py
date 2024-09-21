@@ -114,6 +114,8 @@ class MangaUtilities:
     def compress_jpeg(self, file, quality, progress_callback=None):
         print("Compressing", file, "at quality", quality)
         image = Image.open(os.path.normpath(file))
+        if image.mode != 'RGB':
+            image = image.convert('RGB')
         image.save(file, "JPEG", optimize=True, quality=quality)
 
     def repack(self, file_iterable, out, progress_callback=None):
